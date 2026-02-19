@@ -285,9 +285,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1a472a",
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingTop: 40,
-    paddingBottom: 20,
+    justifyContent: "space-evenly",
+    paddingTop: 60,
+    paddingBottom: 80,
     paddingHorizontal: 10,
   },
   title: {
@@ -308,8 +308,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
-    paddingTop: 10,
     width: "100%",
+    paddingTop: 10,
   },
   cardsRow: {
     flexDirection: "row",
@@ -399,8 +399,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   deckContainer: {
-    marginTop: 30,
-    marginBottom: 20,
+    marginTop: 20,
     alignItems: "center",
   },
   deckCard: {
