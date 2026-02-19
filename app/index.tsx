@@ -118,9 +118,18 @@ const getExercise = (card: Card): Exercise => {
       ABDOMINAL_TYPES[Math.floor(Math.random() * ABDOMINAL_TYPES.length)];
     return { name: `Abdominales (${randomAb})`, reps: 20, type: "abdominales" };
   } else {
-    const randomEsp =
-      ESPINAL_TYPES[Math.floor(Math.random() * ESPINAL_TYPES.length)];
-    return { name: `Espinales (${randomEsp})`, reps: 20, type: "espinales" };
+    // Cada figura roja tiene un tipo de espinal fijo
+    const espinalMap: { [key: string]: string } = {
+      J: "Comunes",
+      Q: "Alternados",
+      K: "Nados",
+    };
+    const espinalType = espinalMap[value];
+    return {
+      name: `Espinales (${espinalType})`,
+      reps: 20,
+      type: `espinales_${value.toLowerCase()}`,
+    };
   }
 };
 
