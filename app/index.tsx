@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -261,7 +262,10 @@ export default function Index() {
         {deck.length > 0 ? (
           <TouchableOpacity onPress={drawCards} style={styles.deckCard}>
             <View style={styles.deckBack}>
-              <Text style={styles.deckBackText}>🎴</Text>
+              <Image
+                source={require("../assets/images/Calaveramt.jpg")}
+                style={styles.deckImage}
+              />
               <Text style={styles.deckCount}>{deck.length}</Text>
             </View>
           </TouchableOpacity>
@@ -282,14 +286,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a472a",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 60,
-    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
+    paddingHorizontal: 10,
   },
   title: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: "bold",
     color: "#fff",
     marginBottom: 5,
+    textAlign: "center",
+    width: "100%",
+    flexShrink: 0,
   },
   subtitle: {
     fontSize: 16,
@@ -300,7 +308,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
-    paddingTop: 20,
+    paddingTop: 10,
+    width: "100%",
   },
   cardsRow: {
     flexDirection: "row",
@@ -348,36 +357,39 @@ const styles = StyleSheet.create({
     color: "#c41e3a",
   },
   exerciseContainer: {
-    maxHeight: 200,
+    flex: 1,
     width: "100%",
     backgroundColor: "rgba(255,255,255,0.1)",
     borderRadius: 12,
-    padding: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    marginTop: 15,
   },
   exerciseTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#ffd700",
-    marginBottom: 10,
+    marginBottom: 15,
     textAlign: "center",
   },
   exerciseItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 10,
     backgroundColor: "rgba(255,255,255,0.15)",
-    padding: 10,
-    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderRadius: 10,
   },
   exerciseReps: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     color: "#ff6b35",
     marginRight: 10,
-    minWidth: 50,
+    minWidth: 55,
   },
   exerciseName: {
-    fontSize: 16,
+    fontSize: 17,
     color: "#fff",
     flex: 1,
   },
@@ -387,7 +399,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   deckContainer: {
-    marginBottom: 40,
+    marginTop: 30,
+    marginBottom: 20,
     alignItems: "center",
   },
   deckCard: {
@@ -410,8 +423,10 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: "#ffd700",
   },
-  deckBackText: {
-    fontSize: 40,
+  deckImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   deckCount: {
     fontSize: 14,
