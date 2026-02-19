@@ -1,20 +1,136 @@
 import { useState } from "react";
 import {
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
-const TOTAL_CARDS = 52;
 const CARD_WIDTH = 70;
 const CARD_HEIGHT = 100;
 
-// Crear un mazo inicial con cartas del 1 al 52
-const createDeck = (): number[] => {
-  const deck: number[] = [];
-  for (let i = 1; i <= TOTAL_CARDS; i++) {
-    deck.push(i);
+// Tipos de palos
+type Suit = "♠" | "♣" | "♥" | "♦";
+type Value =
+  | "A"
+  | "2"
+  | "3"
+  | "4"
+  | "5"
+  | "6"
+  | "7"
+  | "8"
+  | "9"
+  | "10"
+  | "J"
+  | "Q"
+  | "K";
+
+interface Card {
+  suit: Suit;
+  value: Value;
+  id: string;
+}
+
+interface Exercise {
+  name: string;
+  reps: number;
+  type: string;
+}
+
+const SUITS: Suit[] = ["♠", "♣", "♥", "♦"];
+const VALUES: Value[] = [
+  "A",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "J",
+  "Q",
+  "K",
+];
+
+const isBlackSuit = (suit: Suit): boolean => suit === "♠" || suit === "♣";
+const isRedSuit = (suit: Suit): boolean => suit === "♥" || suit === "♦";
+
+// Tipos de abdominales para cartas negras (figuras)
+const ABDOMINAL_TYPES = [
+  "Bicicleta",
+  "Bolita",
+  "Bisagra",
+  "Tijera",
+  "Giros rusos",
+  "Elevaciones de cadera",
+];
+
+// Tipos de espinales para cartas rojas (figuras)
+const ESPINAL_TYPES = ["Comunes", "Alternados", "Nados"];
+
+// Obtener el ejercicio correspondiente a una carta
+const getExercise = (card: Card): Exercise => {
+  const { suit, value } = card;
+  const isBlack = isBlackSuit(suit);
+  const numericValue = ["2", "3", "4", "5", "6", "7", "8", "9", "10"].includes(
+    value,
+  )
+    ? parseInt(value)
+    : 0;
+
+  if (value === "A") {
+    return isBlack
+      ? { name: "Burpees", reps: 10, type: "burpees" }
+      : { name: "Burpees al revés", reps: 10, type: "burpees_reves" };
+  }
+
+  if (["2", "3", "4", "5"].includes(value)) {
+    return isBlack
+      ? {
+          name: "Flexiones con aplauso",
+          reps: numericValue,
+          type: "flexiones_aplauso",
+        }
+      : {
+          name: "Rodillas al pecho",
+          reps: numericValue,
+          type: "rodillas_pecho",
+        };
+  }
+
+  if (["6", "7", "8", "9", "10"].includes(value)) {
+    return isBlack
+      ? {
+          name: "Flexiones comunes",
+          reps: numericValue,
+          type: "flexiones_comunes",
+        }
+      : { name: "Sentadillas", reps: numericValue, type: "sentadillas" };
+  }
+
+  // Figuras (J, Q, K)
+  if (isBlack) {
+    const randomAb =
+      ABDOMINAL_TYPES[Math.floor(Math.random() * ABDOMINAL_TYPES.length)];
+    return { name: `Abdominales (${randomAb})`, reps: 20, type: "abdominales" };
+  } else {
+    const randomEsp =
+      ESPINAL_TYPES[Math.floor(Math.random() * ESPINAL_TYPES.length)];
+    return { name: `Espinales (${randomEsp})`, reps: 20, type: "espinales" };
+  }
+};
+
+// Crear un mazo de 52 cartas
+const createDeck = (): Card[] => {
+  const deck: Card[] = [];
+  for (const suit of SUITS) {
+    for (const value of VALUES) {
+      deck.push({ suit, value, id: `${value}${suit}` });
+    }
   }
   // Mezclar el mazo
   for (let i = deck.length - 1; i > 0; i--) {
@@ -24,19 +140,33 @@ const createDeck = (): number[] => {
   return deck;
 };
 
+// Sumar ejercicios iguales
+const summarizeExercises = (cards: Card[]): Exercise[] => {
+  const exerciseMap: { [key: string]: Exercise } = {};
+
+  for (const card of cards) {
+    const exercise = getExercise(card);
+    if (exerciseMap[exercise.type]) {
+      exerciseMap[exercise.type].reps += exercise.reps;
+    } else {
+      exerciseMap[exercise.type] = { ...exercise };
+    }
+  }
+
+  return Object.values(exerciseMap);
+};
+
 export default function Index() {
-  const [deck, setDeck] = useState<number[]>(createDeck());
-  const [drawnCards, setDrawnCards] = useState<number[]>([]);
+  const [deck, setDeck] = useState<Card[]>(createDeck());
+  const [drawnCards, setDrawnCards] = useState<Card[]>([]);
 
   const drawCards = () => {
     if (deck.length === 0) {
-      // Si no hay más cartas, reiniciar el mazo
       setDeck(createDeck());
       setDrawnCards([]);
       return;
     }
 
-    // Tomar hasta 3 cartas del mazo
     const cardsToDraw = Math.min(3, deck.length);
     const newDrawnCards = deck.slice(0, cardsToDraw);
     const remainingDeck = deck.slice(cardsToDraw);
@@ -50,22 +180,66 @@ export default function Index() {
     setDrawnCards([]);
   };
 
+  const exercises = summarizeExercises(drawnCards);
+
   return (
     <View style={styles.container}>
       {/* Título */}
-      <Text style={styles.title}>Mazo de Cartas</Text>
+      <Text style={styles.title}>🥊 Muay Thai Cards</Text>
       <Text style={styles.subtitle}>Cartas restantes: {deck.length}</Text>
 
       {/* Área de cartas mostradas */}
       <View style={styles.drawnCardsContainer}>
         {drawnCards.length > 0 ? (
-          <View style={styles.cardsRow}>
-            {drawnCards.map((cardNumber, index) => (
-              <View key={`${cardNumber}-${index}`} style={styles.card}>
-                <Text style={styles.cardNumber}>{cardNumber}</Text>
-              </View>
-            ))}
-          </View>
+          <>
+            <View style={styles.cardsRow}>
+              {drawnCards.map((card, index) => (
+                <View
+                  key={`${card.id}-${index}`}
+                  style={[
+                    styles.card,
+                    isRedSuit(card.suit) ? styles.cardRed : styles.cardBlack,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.cardSuitTop,
+                      isRedSuit(card.suit) ? styles.textRed : styles.textBlack,
+                    ]}
+                  >
+                    {card.suit}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.cardValue,
+                      isRedSuit(card.suit) ? styles.textRed : styles.textBlack,
+                    ]}
+                  >
+                    {card.value}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.cardSuitBottom,
+                      isRedSuit(card.suit) ? styles.textRed : styles.textBlack,
+                    ]}
+                  >
+                    {card.suit}
+                  </Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Resumen de ejercicios */}
+            <ScrollView style={styles.exerciseContainer}>
+              <Text style={styles.exerciseTitle}>📋 Ejercicios:</Text>
+              {exercises.map((exercise, index) => (
+                <View key={index} style={styles.exerciseItem}>
+                  <Text style={styles.exerciseReps}>{exercise.reps}x</Text>
+                  <Text style={styles.exerciseName}>{exercise.name}</Text>
+                </View>
+              ))}
+            </ScrollView>
+          </>
         ) : (
           <Text style={styles.instructionText}>
             Toca el mazo para sacar 3 cartas
@@ -115,20 +289,22 @@ const styles = StyleSheet.create({
   },
   drawnCardsContainer: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
+    paddingTop: 20,
   },
   cardsRow: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 15,
+    gap: 10,
+    marginBottom: 20,
   },
   card: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
     backgroundColor: "#fff",
-    borderRadius: 10,
-    justifyContent: "center",
+    borderRadius: 8,
+    justifyContent: "space-between",
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -136,12 +312,65 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 8,
     borderWidth: 2,
+    paddingVertical: 5,
+  },
+  cardBlack: {
     borderColor: "#333",
   },
-  cardNumber: {
-    fontSize: 32,
+  cardRed: {
+    borderColor: "#c41e3a",
+  },
+  cardSuitTop: {
+    fontSize: 14,
     fontWeight: "bold",
+  },
+  cardValue: {
+    fontSize: 28,
+    fontWeight: "bold",
+  },
+  cardSuitBottom: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  textBlack: {
+    color: "#000",
+  },
+  textRed: {
     color: "#c41e3a",
+  },
+  exerciseContainer: {
+    maxHeight: 200,
+    width: "100%",
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderRadius: 12,
+    padding: 15,
+  },
+  exerciseTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#ffd700",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  exerciseItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    padding: 10,
+    borderRadius: 8,
+  },
+  exerciseReps: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#ff6b35",
+    marginRight: 10,
+    minWidth: 50,
+  },
+  exerciseName: {
+    fontSize: 16,
+    color: "#fff",
+    flex: 1,
   },
   instructionText: {
     fontSize: 18,
