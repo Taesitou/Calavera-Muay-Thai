@@ -194,7 +194,7 @@ export default function Index() {
   return (
     <View style={styles.container}>
       {/* Título */}
-      <Text style={styles.title}>🥊 Muay Thai Cards</Text>
+      <Text style={styles.title}>💀 El Juego De Las Cartas 💀</Text>
       <Text style={styles.subtitle}>Cartas restantes: {deck.length}</Text>
 
       {/* Área de cartas mostradas */}
