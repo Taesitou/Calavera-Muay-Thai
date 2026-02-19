@@ -115,9 +115,22 @@ const getExercise = (card: Card): Exercise => {
 
   // Figuras (J, Q, K)
   if (isBlack) {
-    const randomAb =
-      ABDOMINAL_TYPES[Math.floor(Math.random() * ABDOMINAL_TYPES.length)];
-    return { name: `Abdominales (${randomAb})`, reps: 20, type: "abdominales" };
+    // Cada combinación figura + palo tiene un tipo de abdominal fijo
+    const abdominalMap: { [key: string]: string } = {
+      "J♠": "Bicicleta",
+      "J♣": "Bolita",
+      "Q♠": "Bisagra",
+      "Q♣": "Tijera",
+      "K♠": "Giros rusos",
+      "K♣": "Elevaciones de cadera",
+    };
+    const key = `${value}${suit}`;
+    const abdominalType = abdominalMap[key];
+    return {
+      name: `Abdominales (${abdominalType})`,
+      reps: 20,
+      type: `abdominales_${key}`,
+    };
   } else {
     // Cada figura roja tiene un tipo de espinal fijo
     const espinalMap: { [key: string]: string } = {
