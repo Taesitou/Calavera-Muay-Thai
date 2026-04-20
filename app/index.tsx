@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Linking,
 } from "react-native";
 
 const CARD_WIDTH = 70;
@@ -343,6 +344,22 @@ export default function Index() {
           <Text style={styles.historyButtonNavText}>➡️</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          Juego original por Calavera Muay Thai
+        </Text>
+        <Text style={styles.footerText}>
+          Desarrollo web por{" "}
+          <Text
+            style={styles.linkText}
+            onPress={() => Linking.openURL("https://instagram.com/tomy_espinosa")}
+          >
+            Tomás Espinosa
+          </Text>
+        </Text>
+      </View>
     </View>
   );
 }
@@ -539,5 +556,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#aaa",
     marginTop: 5,
+  },
+  footer: {
+    marginTop: 30,
+    alignItems: "center",
+  },
+  footerText: {
+    color: "#ccc",
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  linkText: {
+    color: "#ffd700",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
 });
