@@ -182,11 +182,15 @@ const summarizeExercises = (cards: Card[]): Exercise[] => {
 export default function Index() {
   const [deck, setDeck] = useState<Card[]>(createDeck());
   const [drawnCards, setDrawnCards] = useState<Card[]>([]);
+  const [history, setHistory] = useState<Card[][]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number | null>(null);
 
   const drawCards = () => {
     if (deck.length === 0) {
       setDeck(createDeck());
       setDrawnCards([]);
+      setHistory([]);
+      setHistoryIndex(null);
       return;
     }
 
@@ -194,16 +198,42 @@ export default function Index() {
     const newDrawnCards = deck.slice(0, cardsToDraw);
     const remainingDeck = deck.slice(cardsToDraw);
 
+    if (drawnCards.length > 0) {
+      setHistory((prev) => [...prev, drawnCards]);
+    }
+    
     setDrawnCards(newDrawnCards);
     setDeck(remainingDeck);
+    setHistoryIndex(null);
   };
 
   const resetDeck = () => {
     setDeck(createDeck());
     setDrawnCards([]);
+    setHistory([]);
+    setHistoryIndex(null);
   };
 
-  const exercises = summarizeExercises(drawnCards);
+  const goBack = () => {
+    if (history.length === 0) return;
+    if (historyIndex === null) {
+      setHistoryIndex(history.length - 1);
+    } else if (historyIndex > 0) {
+      setHistoryIndex(historyIndex - 1);
+    }
+  };
+
+  const goForward = () => {
+    if (historyIndex === null) return;
+    if (historyIndex < history.length - 1) {
+      setHistoryIndex(historyIndex + 1);
+    } else {
+      setHistoryIndex(null);
+    }
+  };
+
+  const currentDisplayCards = historyIndex !== null ? history[historyIndex] : drawnCards;
+  const exercises = summarizeExercises(currentDisplayCards);
 
   return (
     <View style={styles.container}>
@@ -213,10 +243,10 @@ export default function Index() {
 
       {/* Área de cartas mostradas */}
       <View style={styles.drawnCardsContainer}>
-        {drawnCards.length > 0 ? (
+        {currentDisplayCards.length > 0 ? (
           <>
             <View style={styles.cardsRow}>
-              {drawnCards.map((card, index) => (
+              {currentDisplayCards.map((card, index) => (
                 <View
                   key={`${card.id}-${index}`}
                   style={[
@@ -270,24 +300,48 @@ export default function Index() {
         )}
       </View>
 
-      {/* Mazo (cara abajo) */}
-      <View style={styles.deckContainer}>
-        {deck.length > 0 ? (
-          <TouchableOpacity onPress={drawCards} style={styles.deckCard}>
-            <View style={styles.deckBack}>
-              <Image
-                source={require("../assets/images/Calaveramt.jpg")}
-                style={styles.deckImage}
-              />
-              <Text style={styles.deckCount}>{deck.length}</Text>
-            </View>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={resetDeck} style={styles.emptyDeck}>
-            <Text style={styles.emptyDeckText}>🔄</Text>
-            <Text style={styles.resetText}>Reiniciar</Text>
-          </TouchableOpacity>
-        )}
+      {/* Mazo (cara abajo) con Botones de Historial */}
+      <View style={styles.deckSectionContainer}>
+        <TouchableOpacity 
+          onPress={goBack} 
+          disabled={history.length === 0 || historyIndex === 0}
+          style={[
+            styles.historyButtonNav, 
+            history.length === 0 ? styles.hiddenButton : ((history.length === 0 || historyIndex === 0) && styles.disabledButton)
+          ]}
+        >
+          <Text style={styles.historyButtonNavText}>⬅️</Text>
+        </TouchableOpacity>
+
+        <View style={styles.deckContainer}>
+          {deck.length > 0 ? (
+            <TouchableOpacity onPress={drawCards} style={styles.deckCard}>
+              <View style={styles.deckBack}>
+                <Image
+                  source={require("../assets/images/Calaveramt.jpg")}
+                  style={styles.deckImage}
+                />
+                <Text style={styles.deckCount}>{deck.length}</Text>
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={resetDeck} style={styles.emptyDeck}>
+              <Text style={styles.emptyDeckText}>🔄</Text>
+              <Text style={styles.resetText}>Reiniciar</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <TouchableOpacity 
+          onPress={goForward} 
+          disabled={history.length === 0 || historyIndex === null}
+          style={[
+            styles.historyButtonNav, 
+            history.length === 0 ? styles.hiddenButton : (historyIndex === null && styles.disabledButton)
+          ]}
+        >
+          <Text style={styles.historyButtonNavText}>➡️</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -411,8 +465,29 @@ const styles = StyleSheet.create({
     color: "#aaa",
     textAlign: "center",
   },
-  deckContainer: {
+  deckSectionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 40,
     marginTop: 20,
+  },
+  historyButtonNav: {
+    padding: 15,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 8,
+  },
+  historyButtonNavText: {
+    fontSize: 24,
+  },
+  disabledButton: {
+    opacity: 0.3,
+  },
+  hiddenButton: {
+    opacity: 0,
+  },
+  deckContainer: {
     alignItems: "center",
   },
   deckCard: {
