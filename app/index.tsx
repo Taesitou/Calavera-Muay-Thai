@@ -237,7 +237,7 @@ export default function Index() {
   const exercises = summarizeExercises(currentDisplayCards);
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       {/* Título */}
       <Text style={styles.title}>💀 El Juego De Las Cartas 💀</Text>
       <Text style={styles.subtitle}>Cartas restantes: {deck.length}</Text>
@@ -284,15 +284,14 @@ export default function Index() {
             </View>
 
             {/* Resumen de ejercicios */}
-            <ScrollView style={styles.exerciseContainer}>
-              <Text style={styles.exerciseTitle}>📋 Ejercicios:</Text>
+            <View style={styles.exerciseContainer}>
               {exercises.map((exercise, index) => (
                 <View key={index} style={styles.exerciseItem}>
                   <Text style={styles.exerciseReps}>{exercise.reps}x</Text>
                   <Text style={styles.exerciseName}>{exercise.name}</Text>
                 </View>
               ))}
-            </ScrollView>
+            </View>
           </>
         ) : (
           <Text style={styles.instructionText}>
@@ -360,19 +359,20 @@ export default function Index() {
           </Text>
         </Text>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "#1a472a",
     alignItems: "center",
-    justifyContent: "space-evenly",
+    justifyContent: "center",
     paddingTop: 60,
-    paddingBottom: 80,
+    paddingBottom: 40,
     paddingHorizontal: 10,
+    gap: 15,
   },
   title: {
     fontSize: 22,
@@ -386,14 +386,10 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: "#ccc",
-    marginBottom: 20,
   },
   drawnCardsContainer: {
-    flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
     width: "100%",
-    paddingTop: 10,
+    alignItems: "center",
   },
   cardsRow: {
     flexDirection: "row",
@@ -441,13 +437,13 @@ const styles = StyleSheet.create({
     color: "#c41e3a",
   },
   exerciseContainer: {
-    flex: 1,
     width: "100%",
     backgroundColor: "rgba(255,255,255,0.1)",
     borderRadius: 12,
     paddingVertical: 15,
     paddingHorizontal: 10,
     marginTop: 15,
+    flexGrow: 0,
   },
   exerciseTitle: {
     fontSize: 20,
